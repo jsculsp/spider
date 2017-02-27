@@ -62,7 +62,6 @@ def login_simulation():
         print e.code
         print e.reason
         return
-    log('debug location 0...')
     cookie.save(ignore_discard=True, ignore_expires=False)
     homeUrl = 'https://www.zhihu.com/'
     req2 = urllib2.Request(homeUrl, headers=headers)
