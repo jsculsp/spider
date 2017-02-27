@@ -25,17 +25,16 @@ headers = {
 
 def generate_opener():
     filename = os.path.join(PROJECT_ROOT, 'zhihu/cookie.txt')
-    try:
-        cookie = cookielib.MozillaCookieJar()
-        cookie.load(filename, ignore_discard=True, ignore_expires=True)
-    except:
-        cookie = cookielib.MozillaCookieJar(filename)
+    cookie = cookielib.MozillaCookieJar()
+    cookie.load(filename, ignore_discard=True, ignore_expires=True)
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
     return cookie, opener
 
 
 def login(password):
-    cookie, opener = generate_opener()
+    filename = os.path.join(PROJECT_ROOT, 'zhihu/cookie.txt')
+    cookie = cookielib.MozillaCookieJar(filename)
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
     postdata = urllib.urlencode({
         'email': 'jsculsp@126.com',
         'password': password,
@@ -50,17 +49,28 @@ def login(password):
         log(e.code, e.reason)
         return False
     cookie.save(ignore_discard=True, ignore_expires=False)
-    return True
+    return cookie, opener
 
 
-def visit_by_url(password, url, filename):
-    flag = login(password)
-    if flag == False:
-        print('login failed, please check your log file...')
-    _, opener = generate_opener()
+def visit_by_url():
+    url = raw_input(u'请输入你想访问的 URL: \r\n'.encode('gbk'))
+    filename = raw_input(u'请输入保存的文件的文件名(后缀为 .html)：\r\n'.encode('gbk'))
     req = urllib2.Request(url, headers=headers)
-    result = opener.open(req)
+    try:
+        _, opener = generate_opener()
+    except cookielib.LoadError:
+        password = raw_input(u'cookie 文件不存在，请重新输入你的密码：\r\n'.encode('gbk'))
+        _, opener = login(password)
+    try:
+        result = opener.open(req)
+    except urllib2.HTTPError:
+        password = raw_input(u'你的 cookie 已经过期，请重新输入你的密码：\r\n'.encode('gbk'))
+        _, opener = login(password)
+        result = opener.open(req)
+    if result == False:
+        print(u'login failed, please check your log file...')
+        return
     path = os.path.join(PROJECT_ROOT, 'zhihu/pages', filename)
     with open(path, 'w') as f:
         f.write(result.read())
-    print('success!')
+    print(u'success!')

@@ -45,3 +45,5 @@ venv
 
 .idea/
 media/
+/zhihu/pages/index.html
+/zhihu/pages/
