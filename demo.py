@@ -39,8 +39,8 @@ def login_simulation():
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
     postdata = urllib.urlencode({
         'email': 'jsculsp@126.com',
-        'password': '***',
-        '_xsrf': 'a2a06a71dfe6c89bc6b7399819e52639',
+        'password': 'wwg1984',
+        '_xsrf': 'f2d467cceb2be896f51a69b6db691810',
         'captcha_type': 'cn',
     })
     headers = {
